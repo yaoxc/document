@@ -9,11 +9,44 @@
 
 ### 2、核心原理（发布 - 订阅模型）
 
-![image-20251210221913163](C:\Users\83892\AppData\Roaming\Typora\typora-user-images\image-20251210221913163.png)
+```xml
+┌─────────────────────────────────────────────────────────┐
+│                    Spring 容器（ApplicationContext）     │
+│  ┌───────────────┐        ┌───────────────┐             │
+│  │ 事件发布者    │        │ 事件广播器    │             │
+│  │ (ApplicationEventPublisher)                 │             │
+│  └───────┬───────┘        └───────┬───────┘             │
+│          │                        │                     │
+│          ▼                        ▼                     │
+│  ┌───────────────┐        ┌───────────────┐             │
+│  │ 应用事件      │        │ 事件监听器    │             │
+│  │ (ApplicationEvent)     │ (ApplicationListener)       │
+│  └───────┬───────┘        └───────┬───────┘             │
+│          │                        │                     │
+│          └────────────────────────┘                     │
+└─────────────────────────────────────────────────────────┘
+```
 
-- **事件（Event）**：继承 `ApplicationEvent` 的类，承载事件数据；
-- **发布者（Publisher）**：通过 `ApplicationEventPublisher` 发布事件；
-- **监听器（Listener）**：实现 `ApplicationListener` 接口，监听指定事件。
+### 组件说明
+
+1. **事件发布者（ApplicationEventPublisher）**
+   - 是 Spring 容器的核心接口之一，`ApplicationContext`本身实现了该接口，因此容器可直接作为事件发布者。
+   - 核心方法：`publishEvent(Object event)`，用于发布自定义或内置的应用事件。
+2. **应用事件（ApplicationEvent）**
+   - 所有事件的父类，封装了事件源（`source`）和事件发生时间（`timestamp`）。
+   - 常见实现：`ContextRefreshedEvent`（容器刷新完成）、`ContextClosedEvent`（容器关闭）、自定义业务事件（如`OrderCreatedEvent`）。
+3. **事件广播器（ApplicationEventMulticaster）**
+   - 是事件分发的核心中间件，默认实现为`SimpleApplicationEventMulticaster`。
+   - 作用：接收发布者的事件，根据事件类型匹配对应的监听器，并将事件分发给监听器处理（支持同步 / 异步分发）。
+4. **事件监听器（ApplicationListener）**
+   - 泛型接口，需指定监听的事件类型，核心方法`onApplicationEvent(E event)`用于处理事件。
+   - 注册方式：`@Component`注解、`@EventListener`注解、手动注册到容器。
+5. ApplicationListener 发布订阅执行流程图
+   1. **事件触发**：业务代码或 Spring 容器生命周期（如容器刷新、关闭）触发事件发布。
+   2. **事件发布**：通过`ApplicationContext.publishEvent()`将`ApplicationEvent`对象发送给事件广播器。
+   3. **事件分发**：事件广播器根据事件类型，筛选出所有匹配的`ApplicationListener`（泛型匹配）。
+   4. **事件处理**：广播器调用监听器的`onApplicationEvent()`方法，执行事件处理逻辑（默认同步，可配置异步）。
+   5. **处理完成**：监听器处理完毕，整个发布订阅流程结束。
 
 ### 3、常见用法（分场景示例）
 
