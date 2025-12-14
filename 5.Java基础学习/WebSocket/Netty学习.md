@@ -1,4 +1,4 @@
-## 一、netty也websocket什么关系？
+## 一、Netty和WebSocket什么关系？
 
 Netty 和 WebSocket 的关系可以概括为：
 
@@ -9,7 +9,7 @@ Netty 和 WebSocket 的关系可以概括为：
 
 
 
-## 二、使用netty实现websocket的优势
+## 二、使用Netty实现WebSocket的优势
 
 如果不用 Netty，直接用 Java 原生的 `javax.websocket`（JSR 356）也能实现 WebSocket，但 Netty 有明显优势。
 
