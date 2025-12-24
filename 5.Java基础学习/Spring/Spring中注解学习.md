@@ -1,4 +1,4 @@
-###  一、 @PostConstruct注解
+## 一、 @PostConstruct注解
 
 #### 1、核心作用
 
@@ -77,4 +77,16 @@ BeanA 的 @PostConstruct 执行  // B 注入后，A 才执行
 
 1. 若想在**整个 Spring 容器所有 Bean 都创建完成后**执行逻辑，不能用 `@PostConstruct`，需要用 `ApplicationListener<ContextRefreshedEvent>` 或 `@EventListener(ContextRefreshedEvent.class)`；
 2. `@PostConstruct` 是单个 Bean 生命周期的环节，而容器刷新完成是整个上下文的生命周期环节，二者层级不同。
+
+
+
+## 二、@PreDestroy的作用
+
+`@PostConstruct`：**调用时机**：Bean **依赖注入完成后**（构造器→Setter/Field→@Autowired 全部完毕）立即执行一次。
+
+`@PreDestroy`：**调用时机**：Spring 容器**即将销毁 Bean** 之前（应用正常关闭 `ctx.close()` / `SpringApplication.exit()` / 收到 SIGTERM）。
+
+一句话记忆
+`@PostConstruct`：**注入完就执行** → 打开资源
+`@PreDestroy`：**容器销毁前执行** → 释放资源
 
